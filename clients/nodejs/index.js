@@ -36,11 +36,15 @@ if ((!argv.host || !argv.port || !argv.key || !argv.cert) && !argv.dumb || argv.
         '         [:THROTTLE_WAIT]]]  throttled using THROTTLE_AFTER and _WAIT arguments.\n' +
         '  --passive                  Do not actively connect to the network and do not\n' +
         '                             wait for connection establishment.\n' +
+        '  --pool=SERVER              Select SERVER as the mining pool server to join.\n' +
         '  --rpc[=PORT]               Start JSON-RPC server on port PORT (default: 8648).\n' +
         '  --metrics[=PORT]           Start Prometheus-compatible metrics server on port\n' +
         '           [:PASSWORD]       PORT (default: 8649). If PASSWORD is specified, it\n' +
         '                             is required to be used for username "metrics" via\n' +
         '                             Basic Authentication.\n' +
+        '                             using this option.\n' +
+        '  --network=NAME             Configure the network to connect to, one of\n' +
+        '                             main (default), test, dev, or bounty.\n' +
         '  --statistics[=INTERVAL]    Output statistics like mining hashrate, current\n' +
         '                             account balance and mempool size every INTERVAL\n' +
         '                             seconds.\n' +
@@ -48,10 +52,7 @@ if ((!argv.host || !argv.port || !argv.key || !argv.cert) && !argv.dumb || argv.
         '                             full (default), light, or nano.\n' +
         '  --wallet-seed=SEED         Initialize wallet using SEED as a wallet seed.\n' +
         '  --wallet-address=ADDRESS   Initialize wallet using ADDRESS as a wallet address\n' +
-        '                             The wallet cannot be used to sign transactions when\n' +
-        '                             using this option.\n' +
-        '  --network=NAME             Configure the network to connect to, one of\n' +
-        '                             main (default), test, dev, or bounty.\n');
+        '                             The wallet cannot be used to sign transactions when\n');
 
     process.exit();
 }
@@ -76,6 +77,7 @@ if (typeof metrics === 'string') {
 } else if (typeof metrics === 'number') {
     metricsPort = metrics;
 }
+const pool = argv.pool;
 // TODO set default to 'main' for MainNet.
 const network = argv.network || 'dev';
 const walletSeed = argv['wallet-seed'] || null;
@@ -112,7 +114,7 @@ if (argv['log-tag']) {
     }
     argv['log-tag'].forEach((lt) => {
         const s = lt.split(':');
-        Nimiq.Log.instance.setLoggable(s[0], s.length === 1 ? 2 : s[1]);
+        Nimiq.Log.instance.setLoggable(s[0], s.length === 1 ? 2 : parseInt(s[1]));
     });
 }
 
@@ -249,6 +251,18 @@ const $ = {};
     if (metrics) {
         $.metricsServer = new MetricsServer(networkConfig.sslConfig, metricsPort, metricsPassword);
         $.metricsServer.init($.blockchain, $.accounts, $.mempool, $.network, $.miner);
+    }
+
+    if (pool) {
+        // This should be fairly unique device id number, generated from the peer key, without leaking anything about key or peer id
+        const deviceId = Hash.blake2b([
+            BufferUtils.fromAscii('pool_device_id'),
+            networkConfig.keyPair.privateKey.serialize().read(4),
+            networkConfig.peerId.serialize()
+        ].reduce(BufferUtils.concatTypedArrays)).serialize().readUint32();
+        Nimiq.Log.i(TAG, `Connecting to pool ${pool} using device id ${deviceId}.`);
+        $.pool = new Nimiq.PoolClient($.miner, $.wallet.address, deviceId);
+        $.pool.connect(pool);
     }
 })().catch(e => {
     console.error(e);
