@@ -85,7 +85,7 @@ class SerialBuffer extends Uint8Array {
      * @return {number}
      */
     readUint16() {
-        const value = this._view.getUint16(this._readPos);
+        const value = this._view.getUint16(this._readPos, true);
         this._readPos += 2;
         return value;
     }
@@ -94,7 +94,7 @@ class SerialBuffer extends Uint8Array {
      * @param {number} value
      */
     writeUint16(value) {
-        this._view.setUint16(this._writePos, value);
+        this._view.setUint16(this._writePos, value, true);
         this._writePos += 2;
     }
 
@@ -102,7 +102,7 @@ class SerialBuffer extends Uint8Array {
      * @return {number}
      */
     readUint32() {
-        const value = this._view.getUint32(this._readPos);
+        const value = this._view.getUint32(this._readPos, true);
         this._readPos += 4;
         return value;
     }
@@ -111,7 +111,7 @@ class SerialBuffer extends Uint8Array {
      * @param {number} value
      */
     writeUint32(value) {
-        this._view.setUint32(this._writePos, value);
+        this._view.setUint32(this._writePos, value, true);
         this._writePos += 4;
     }
 
@@ -119,7 +119,7 @@ class SerialBuffer extends Uint8Array {
      * @return {number}
      */
     readUint64() {
-        const value = this._view.getUint32(this._readPos) * Math.pow(2, 32) + this._view.getUint32(this._readPos + 4);
+        const value = this._view.getUint32(this._readPos, true) * Math.pow(2, 32) + this._view.getUint32(this._readPos + 4, true);
         if (!NumberUtils.isUint64(value)) throw new Error('Malformed value');
         this._readPos += 8;
         return value;
@@ -130,8 +130,8 @@ class SerialBuffer extends Uint8Array {
      */
     writeUint64(value) {
         if (!NumberUtils.isUint64(value)) throw new Error('Malformed value');
-        this._view.setUint32(this._writePos, Math.floor(value / Math.pow(2, 32)));
-        this._view.setUint32(this._writePos + 4, value);
+        this._view.setUint32(this._writePos, Math.floor(value / Math.pow(2, 32)), true);
+        this._view.setUint32(this._writePos + 4, value, true);
         this._writePos += 8;
     }
 
@@ -191,7 +191,7 @@ class SerialBuffer extends Uint8Array {
      * @return {number}
      */
     readFloat64() {
-        const value = this._view.getFloat64(this._readPos);
+        const value = this._view.getFloat64(this._readPos, true);
         this._readPos += 8;
         return value;
     }
@@ -200,7 +200,7 @@ class SerialBuffer extends Uint8Array {
      * @param {number} value
      */
     writeFloat64(value) {
-        this._view.setFloat64(this._writePos, value);
+        this._view.setFloat64(this._writePos, value, true);
         this._writePos += 8;
     }
 
