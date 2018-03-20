@@ -123,6 +123,7 @@ if [[ "$init_type" != 'none' ]]; then
   mkdir -p '/var/log/{{ node_deb_package_name }}'
   mkdir -p '/var/lib/{{ node_deb_package_name }}'
   chown -R '{{ node_deb_user }}:{{ node_deb_group }}' '/var/log/{{ node_deb_package_name }}' '/var/lib/{{ node_deb_package_name }}'
+  chmod 700 '/var/lib/{{ node_deb_package_name }}'
 
   start_service '{{ node_deb_package_name }}'
 fi

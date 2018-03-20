@@ -75,11 +75,12 @@ node index.js --host=HOSTNAME --port=PORT --cert=SSL_CERT_FILE --key=SSL_KEY_FIL
 ### Build binary packages for Linux distributions (currently only .deb packages are supported)
 After running `npm run build` or `yarn build` (from the Quickstart section):
 
-1. Make sure you have `dpkg`, `jq` and `fakeroot` installed (if you don't, they can be easily installed with `apt` or `brew`).
+1. Make sure you have `dpkg`, `jq` and `fakeroot` installed (if you don't, they can be easily installed with `apt`).
 2. Run `gulp prepare-packages`.
 3. Run `npm run build-packages`.
 4. The .deb package will be located in the `dist/` directory.
 
+Note: packaging only works from a Linux computer with the same architecture (i.e. amd64) as the package being built.
 
 ## Core Developers
 Developers are free to choose between `npm` and `yarn` for managing the dependencies.
