@@ -34,9 +34,17 @@ Follow the Quickstart guide or use our CDN:
 <script src="https://cdn.nimiq.com/core/nimiq.js"></script>
 ```
 
-
 ### Run browser client
 Open `clients/browser/index.html` in your browser.
+
+### Build your own browser client
+Just include `<script src="dist/nimiq.js"></script>` in your project.
+
+### API
+Visit the [API Documentation](dist/API_DOCUMENTATION.md).
+
+
+## Node.js client
 
 ### Run Node.js client
 To run a Node.js client you will need a **publicly routable IP**, **Domain** and **SSL Certificate** (get a free one at [letsencrypt.org](https://letsencrypt.org/)). Start the client by running `clients/nodejs/index.js`.
@@ -64,11 +72,13 @@ node index.js --host=HOSTNAME --port=PORT --cert=SSL_CERT_FILE --key=SSL_KEY_FIL
 | `--wallet-seed=SEED` | Initialize wallet using SEED as a wallet seed. |
 | `--wallet-address=ADDRESS` | Initialize wallet using ADDRESS as a wallet address. |
 
-### Build your own browser client
-Just include `<script src="dist/nimiq.js"></script>` in your project.
+### Build binary packages for Linux distributions (currently only .deb packages are supported)
+After running `npm run build` or `yarn build` (from the Quickstart section):
 
-### API
-Visit the [API Documentation](dist/API_DOCUMENTATION.md).
+1. Make sure you have `dpkg`, `jq` and `fakeroot` installed (if you don't, they can be easily installed with `apt` or `brew`).
+2. Run `gulp prepare-packages`.
+3. Run `npm run build-packages`.
+4. The .deb package will be located in the `dist/` directory.
 
 
 ## Core Developers

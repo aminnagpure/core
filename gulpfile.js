@@ -7,6 +7,7 @@ const connect = require('gulp-connect');
 const istanbul = require('istanbul-api');
 const jasmine = require('gulp-jasmine-livereload-task');
 const merge = require('merge2');
+const replace = require('gulp-string-replace');
 const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const uglify = require('gulp-uglify-es').default;
@@ -421,6 +422,26 @@ gulp.task('build-node-istanbul', ['build-istanbul'], function () {
         .pipe(uglify(uglify_config))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('dist'));
+});
+
+const RELEASE_SOURCES = [
+    'dist/VERSION',
+    'package.json',
+    'packaging/cron.sh',
+    process.execPath
+];
+
+const RELEASE_LIB = [
+    'dist/node.*',
+    'dist/worker-*',
+    'dist/nimiq_node.node',
+];
+
+gulp.task('prepare-packages', ['build-node'], function () {
+    gulp.src(RELEASE_SOURCES).pipe(gulp.dest('packaging/src'));
+    gulp.src(['clients/nodejs/*.js']).pipe(replace('../../dist/node.js', './lib/node.js')).pipe(gulp.dest('packaging/src'));
+    gulp.src(['node_modules/**/*'], {base: '.', dot: true }).pipe(gulp.dest('packaging/src'));
+    gulp.src(RELEASE_LIB).pipe(gulp.dest('packaging/src/lib'));
 });
 
 gulp.task('test', ['watch'], function () {
